@@ -53,7 +53,7 @@ a {
 
 a:hover {
   background-color: #222299;
-  color: #eeeeff
+  color: #eeeeff;
 }
 
 #grid {
@@ -67,8 +67,6 @@ a:hover {
   border: 1px solid var(--square-border-color);
   width: var(--square-size);
   height: var(--square-size);
-  //max-width: var(--max-square-size);
-  //max-height: var(--max-square-size);
   background-color: var(--square-blank-bg);
   color: var(--x-color);
   font-size: var(--square-size);
@@ -97,7 +95,6 @@ header {
 
 #rowsNumbers {
   position: absolute;
-  //width: 18vw;
   right: calc((100vw - 8*var(--square-size))/2 + 8*var(--square-size));
   display: flex;
   flex-direction: column;
@@ -109,7 +106,6 @@ header {
   border: 1px solid transparent;
   width: var(--square-size);
   padding-bottom: calc(var(--square-size) / 10);
-  //gap: calc(var(--square-size) / 20);
 }
 
 .rowDisplay {
@@ -118,7 +114,6 @@ header {
   align-items: center;
   border: 1px solid transparent;
   height: var(--square-size);
-  //max-height: var(--max-square-size);
   gap: var(--number-size);
   padding-right: calc(var(--square-size) / 2);
 }

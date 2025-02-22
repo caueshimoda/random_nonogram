@@ -15,8 +15,12 @@ Normally, a Nonogram forms a picture when completely filled, but as Random Nonog
 
 ## Using the X
 
-The X is an element that you can use as a reminder that a given square cannot logically be filled. This will help you solve the puzzle, and the game understands a X filled square as an empty square, not a filled one.
+The X is an element that you can use as a reminder that a given square cannot logically be filled. This will help you solve the puzzle, and the game understands an X filled square as an empty square, not a filled one.
 
 ## Reveal Square
 
 When you have more than 0 "Reveal Square" left, you can use it to reveal a random square. It might reveal that a currently empty square is actually filled, or that a square filled incorrectly by the player is actually empty. 
+
+## Note
+
+It's possible to reutilize the code to build nonograms of different matrices, but it's probably necessary to change the style to fit the squares and numbers on the page.
