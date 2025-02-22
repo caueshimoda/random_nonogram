@@ -1,5 +1,7 @@
 # Random Nonogram
 
+[Play it here!](https://codepen.io/Cau-Shimoda/full/KwKMVJE)
+
 [Nonogram](https://en.wikipedia.org/wiki/Nonogram) is a logic puzzle game where you have to find out which pixels, or squares, should be filled. To do this, you should use the numbers on the edges of the grid to guide you.
 
 The numbers show how many squares are filled in sequence in that row or column. When the numbers are separated, it means there's a gap between them of at least, but not necessarily, 1 empty square. 
