@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Random Nonogram</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="title">Random Nonogram</div>
+<div id="top">
+    <div id="difficulty">Medium</div>
+    <a href="https://github.com/caueshimoda" target="_blank">How to play</a>
+  </div>
+  <div id="colsNumbers"></div>
+  <div id="rowsNumbers"></div>
+  <div id = "grid"></div>
+  <div id="footer">
+    <div id="reveal" class="footer-button clickable">Reveal Square<br>(1 left)</div>
+    <div id="new-game-family">
+      <div id="new-game" class="footer-button clickable">New Game</div>
+      <select id="dif-selection" class="footer-button">
+        <option value="Easy">Easy</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+    </div>
+  </div>
+  <div id="overlay" class="hidden">
+    <div id="reset-page" class="clickable"> You win!<br>Click to start a new game</div>
+  </div>
+  </body>   
+  <script src="./script.js"></script> 
+</html>
