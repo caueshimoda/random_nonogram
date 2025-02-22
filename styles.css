@@ -89,10 +89,6 @@ a:hover {
   height: 8vh;
 }
 
-header {
-  height: 16vh;
-}
-
 #rowsNumbers {
   position: absolute;
   right: calc((100vw - 8*var(--square-size))/2 + 8*var(--square-size));
