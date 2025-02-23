@@ -144,7 +144,7 @@ class Nonogram {
 
     for (let axis1 = 0; axis1 < this[axis]; axis1++) {
       let number = 0, currentAxisIndex = this[axisToCheck][axis1].length - 1;
-      //console.log(this[axisToCheck][axis1]);
+      
       if (axis === 'rows') {
         row = axis1;
       } else {
@@ -170,11 +170,13 @@ class Nonogram {
           currentAxisIndex--;
         }
       }
-
-      if (currentAxisIndex >= 0) {
-        if (number !== this[axisToCheck][axis1][currentAxisIndex]) {
-          return false;
-        }
+      
+      if (currentAxisIndex > 0) {
+        return false;
+      }
+      
+      if (currentAxisIndex === 0 && number !== this[axisToCheck][axis1][currentAxisIndex]) {
+        return false;
       }
     }
     return true;
