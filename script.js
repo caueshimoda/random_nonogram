@@ -60,7 +60,7 @@ class Nonogram {
    * @param {number} [revMedium=1] - Number of reveals for medium difficulty.
    * @param {number} [revHard=2] - Number of reveals for hard difficulty.
    */
-  constructor(rows = 8, cols = 8, sqEasy = 40, sqMedium = 32, sqHard = 24, revEasy = 0, revMedium = 1, revHard = 2) {
+  constructor(rows = 8, cols = 8, sqEasy = 40, sqMedium = 32, sqHard = 24, revEasy = 0, revMedium = 1, revHard = 3) {
     this.end = false; // Flag to indicate if the game is over.
     this.rows = rows; // Number of rows.
     this.cols = cols; // Number of columns.
