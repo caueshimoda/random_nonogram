@@ -69,6 +69,7 @@ class Nonogram {
     this.colsNumbers = []; // Array to store column number hints.
     this.revealTable = { Easy: revEasy, Medium: revMedium, Hard: revHard }; // Object mapping difficulty to reveal counts.
     this.reveals = 0; // Remaining reveals.
+    this.isRevealing = false; // Flag to indicate if the game is in reveal square state.
     this.filledSquares = { Easy: sqEasy, Medium: sqMedium, Hard: sqHard }; // Object mapping difficulty to filled square counts.
     this.squareAttributes = { // Object mapping square states to their visual attributes.
       0: { style: { background: 'white' }, textContent: '' },
@@ -102,14 +103,11 @@ class Nonogram {
       }
     }
 
-    // Initialize the game grid.
+    // Initialize the game grid and assign answers (1 if the square is on the list to be filled, 0 otherwise)
     for (let row = 0; row < this.rows; row++) {
       const rowSquares = [];
       for (let col = 0; col < this.cols; col++) {
-        let answer = 0;
-        if (squaresToFill.includes(this.cols * row + col)) {
-          answer = 1;
-        }
+        let answer = squaresToFill.includes(this.cols * row + col) ? 1 : 0;
         rowSquares.push({ state: 0, answer: answer });
         // Reset square visual state if the game has ended.
         if (this.end) {
@@ -125,7 +123,8 @@ class Nonogram {
    * Checks if a square's state is correct.
    *
    * @param {object} square - The square object.
-   * @returns {boolean} - True if the state is correct, false otherwise.
+   * @returns {boolean} - True: state and answer are the same (1 and 1, 0 and 0),
+   or state is 2 and answer is 0 (both are not 1, meaning not 'filled'). Otherwise: false.
    */
   isCorrectState(square) {
     return square.state % 2 === square.answer % 2;
@@ -152,19 +151,18 @@ class Nonogram {
    * Updates the state and visual representation of a square.
    *
    * @param {string} squareId - The ID of the square element.
+   * @param {object} square - The square object.
    */
-  updateSquare(squareId) {
-    const idSplit = squareId.split('_');
-    const row = idSplit[1], col = idSplit[2];
+  updateSquare(squareId, square) {
     const element = document.getElementById(squareId);
 
-    if (this.squares[row][col].state < 2) {
-      this.squares[row][col].state += 1;
+    if (square.state < 2) {
+      square.state += 1;
     } else {
-      this.squares[row][col].state = 0;
+      square.state = 0;
     }
 
-    changeElement(element, this.squareAttributes[this.squares[row][col].state]);
+    changeElement(element, this.squareAttributes[square.state]);
   }
 
   /**
@@ -250,25 +248,29 @@ class Nonogram {
   }
 
   /**
-   * Reveals a random incorrect square.
+   * Reveals the answer to a selected square.
+   * @param {string} squareId - The ID of the square element.
+   * @param {object} square - The square object.
    */
-  revealSquare() {
-    let row = Math.floor(Math.random() * this.rows);
-    let col = Math.floor(Math.random() * this.cols);
-    
-    // Assign new random numbers to row and col until it gets a square in an incorrect state.
-    while (this.isCorrectState(this.squares[row][col])) {
-      row = Math.floor(Math.random() * this.rows);
-      col = Math.floor(Math.random() * this.cols);
-    }
-
-    const element = document.getElementById(`square_${row}_${col}`);
-    this.squares[row][col].state = this.squares[row][col].answer * -1 + 2;
-
-    changeElement(element, this.squareAttributes[this.squares[row][col].state]);
+  revealSquare(squareId, square) {
+    // Apply a math operation that makes the state change to 1 if the answer is 1, and 2 if it's 0
+    // (We want it to be 2 because it will display an X)
+    square.state = square.answer * -1 + 2;
+    changeElement(document.getElementById(squareId), this.squareAttributes[square.state]);
     this.reveals -= 1;
-    const revealElement = document.getElementById('reveal');
-    revealElement.innerHTML = `Reveal Square<br>${this.reveals} Left`;
+    document.getElementById('reveal').innerHTML = `Reveal Square<br>${this.reveals} Left`;
+    document.getElementById('reveal-overlay').classList.remove('overlay');
+    changeElement(document.getElementById('grid'), {style: {zIndex: 0}});
+    this.isRevealing = false;
+  }
+
+  /**
+   * Set display and game conditions so the player can choose a square to reveal. 
+   */
+  setReveal() {
+    document.getElementById('reveal-overlay').classList.add('overlay');
+    changeElement(document.getElementById('grid'), {style: {zIndex: 2}});
+    this.isRevealing = true;
   }
 
   /**
@@ -287,13 +289,6 @@ class Nonogram {
     this.initializeNonogram(document.getElementById('dif-selection').value);
     this.determineAxisNumbers('rows');
     this.determineAxisNumbers('cols');
-    for (const row of this.squares) {
-      let str = "";
-      for (const col of row) {
-        str += col.answer;
-      }
-      console.log(str);
-    }
 
     this.drawNumbers('col');
     this.drawNumbers('row');
@@ -328,17 +323,22 @@ class Nonogram {
   handleClick(event) {
     if (!this.end) {
       if (event.target.classList.contains('square')) {
-        this.updateSquare(event.target.id);
+        const squareId = event.target.id;
+        const idSplit = squareId.split('_');
+        const row = idSplit[1], col = idSplit[2];
+
+        if (this.isRevealing) {
+          this.revealSquare(squareId, this.squares[row][col]);
+        } else {
+          this.updateSquare(squareId, this.squares[row][col]);
+        }
         if (this.isGameOver()) {
           this.showWinMsg();
         }
         return;
       }
       if (event.target.id === 'reveal' && this.reveals) {
-        this.revealSquare();
-        if (this.isGameOver()) {
-          this.showWinMsg();
-        }
+        this.setReveal();
         return;
       }
     } else if (event.target.id === 'reset-page') {
@@ -358,7 +358,9 @@ const nonogram = new Nonogram();
 nonogram.drawSquares();
 nonogram.startNewGame();
 
+// Add event listener to all clickable elements.
 const elementGroup = document.querySelectorAll('.clickable');
 elementGroup.forEach(element => { element.addEventListener('click', nonogram.handleClick) });
 
+// Wait for all the elements to load before the page is shown.
 window.onload = () => document.body.style.visibility = 'visible';

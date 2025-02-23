@@ -19,7 +19,7 @@ The X is an element that you can use as a reminder that a given square cannot lo
 
 ## Reveal Square
 
-When you have more than 0 "Reveal Square" left, you can use it to reveal a random square. It might reveal that a currently empty square is actually filled, or that a square filled incorrectly by the player is actually empty. 
+When you have more than 0 "Reveal Square" left, you can use it to pick a square and have its answer revealed. It's only avaiable in medium and hard difficulties. Use it wisely to maximize the information you get from a revealed square. 
 
 ## Note
 
