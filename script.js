@@ -62,6 +62,7 @@ class Nonogram {
    */
   constructor(rows = 8, cols = 8, sqEasy = 40, sqMedium = 32, sqHard = 24, revEasy = 0, revMedium = 1, revHard = 3) {
     this.end = false; // Flag to indicate if the game is over.
+    this.squaresLeft = 0; // Number of squares left to be filled.
     this.rows = rows; // Number of rows.
     this.cols = cols; // Number of columns.
     this.squares = []; // 2D array representing the game grid.
@@ -93,6 +94,7 @@ class Nonogram {
     revealElement.innerHTML = `Reveal Square<br>${this.reveals} Left`; // Update the reveal count display.
     const difficultyElement = document.getElementById('difficulty'); // Get the difficulty display element.
     difficultyElement.innerText = difficulty; // Update the difficulty display.
+    this.squaresLeft = filledSquaresLeft; // Sets the number of squares for the player to fill.
 
     // Randomly select squares to fill.
     while (filledSquaresLeft) {
@@ -130,19 +132,66 @@ class Nonogram {
     return square.state % 2 === square.answer % 2;
   }
 
+    /**
+   * Checks if all the elements of a given axis are correct (rows or columns).
+   *
+   * @param {string} axis - The axis ('rows' or 'cols').
+   */
+  isAxisCorrect(axis) {
+    let row, col, subAxis;
+    const axisToCheck = `${axis}Numbers`;
+    subAxis = axis === 'rows'? 'cols': 'rows';
+
+    for (let axis1 = 0; axis1 < this[axis]; axis1++) {
+      let number = 0, currentAxisIndex = this[axisToCheck][axis1].length - 1;
+      //console.log(this[axisToCheck][axis1]);
+      if (axis === 'rows') {
+        row = axis1;
+      } else {
+        col = axis1;
+      }
+
+      for (let axis2 = 0; axis2 < this[subAxis]; axis2++) {
+        if (axis === 'rows') {
+          col = axis2;
+        } else {
+          row = axis2;
+        }
+        if (this.squares[row][col].state === 1) {
+          if (currentAxisIndex < 0) {
+            return false;
+          }
+          number += 1;
+        } else if (number) {
+          if (number !== this[axisToCheck][axis1][currentAxisIndex]) {
+            return false;
+          } 
+          number = 0;
+          currentAxisIndex--;
+        }
+      }
+
+      if (currentAxisIndex >= 0) {
+        if (number !== this[axisToCheck][axis1][currentAxisIndex]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   /**
    * Checks if the entire grid is correct (game over condition).
    *
    * @returns {boolean} - True if the game is over, false otherwise.
    */
   isGameOver() {
-    for (const row of this.squares) {
-      for (const square of row) {
-        if (!this.isCorrectState(square)) {
-          return false;
-        }
-      }
-    }
+    if (!this.isAxisCorrect('rows')) {
+      return false;
+    } 
+    if (!this.isAxisCorrect('cols')) {
+      return false;
+    } 
     this.end = true;
     return true;
   }
@@ -155,11 +204,12 @@ class Nonogram {
    */
   updateSquare(squareId, square) {
     const element = document.getElementById(squareId);
+    square.state = square.state <  2? square.state + 1: 0;
 
-    if (square.state < 2) {
-      square.state += 1;
-    } else {
-      square.state = 0;
+    if (square.state === 1) {
+      this.squaresLeft -= 1;
+    } else if (square.state === 2) {
+      this.squaresLeft += 1;
     }
 
     changeElement(element, this.squareAttributes[square.state]);
@@ -173,11 +223,7 @@ class Nonogram {
   determineAxisNumbers(axis) {
     let row, col, subAxis;
     const axisToUpdate = `${axis}Numbers`;
-    if (axis === 'rows') {
-      subAxis = 'cols';
-    } else {
-      subAxis = 'rows';
-    }
+    subAxis = axis === 'rows'? 'cols': 'rows';
 
     for (let axis1 = 0; axis1 < this[axis]; axis1++) {
       const axisNumbers = [];
@@ -247,17 +293,8 @@ class Nonogram {
     }
   }
 
-  /**
-   * Reveals the answer to a selected square.
-   * @param {string} squareId - The ID of the square element.
-   * @param {object} square - The square object.
-   */
-  revealSquare(squareId, square) {
-    // Apply a math operation that makes the state change to 1 if the answer is 1, and 2 if it's 0
-    // (We want it to be 2 because it will display an X)
-    square.state = square.answer * -1 + 2;
-    changeElement(document.getElementById(squareId), this.squareAttributes[square.state]);
-    this.reveals -= 1;
+  // Exits "Reveal Square" state.
+  exitReveal() {
     document.getElementById('reveal').innerHTML = `Reveal Square<br>${this.reveals} Left`;
     document.getElementById('reveal-overlay').classList.remove('overlay');
     changeElement(document.getElementById('grid'), {style: {zIndex: 0}});
@@ -265,11 +302,34 @@ class Nonogram {
   }
 
   /**
-   * Set display and game conditions so the player can choose a square to reveal. 
+   * Reveals the answer to a selected square.
+   * @param {string} squareId - The ID of the square element.
+   * @param {object} square - The square object.
+   */
+  revealSquare(squareId, square) {
+    if (!this.isCorrectState(square)) {
+      if (square.state === 1) {
+        square.state = 2;
+        this.squaresLeft += 1;
+      } else {
+        square.state = 1;
+        this.squaresLeft -= 1;
+      } 
+    } else if (square.state === 0) {
+      square.state = 2;
+    }
+    changeElement(document.getElementById(squareId), this.squareAttributes[square.state]);
+    this.reveals -= 1;
+    this.exitReveal();
+  }
+
+  /**
+   * Set display and game conditions so the player can pick a square to reveal. 
    */
   setReveal() {
     document.getElementById('reveal-overlay').classList.add('overlay');
     changeElement(document.getElementById('grid'), {style: {zIndex: 2}});
+    changeElement(document.getElementById('reveal'), {style: {zIndex: 2}, textContent: 'Cancel Reveal'});
     this.isRevealing = true;
   }
 
@@ -332,12 +392,19 @@ class Nonogram {
         } else {
           this.updateSquare(squareId, this.squares[row][col]);
         }
-        if (this.isGameOver()) {
-          this.showWinMsg();
+        if (!this.squaresLeft) {
+          console.log('Checking');
+          if (this.isGameOver()) {
+            this.showWinMsg();
+          }
         }
         return;
       }
       if (event.target.id === 'reveal' && this.reveals) {
+        if (this.isRevealing) {
+          this.exitReveal();
+          return;
+        }
         this.setReveal();
         return;
       }
