@@ -295,8 +295,8 @@ class Nonogram {
 
   // Exits "Reveal Square" state.
   exitReveal() {
-    document.getElementById('reveal').innerHTML = `Reveal Square<br>${this.reveals} Left`;
     document.getElementById('reveal-overlay').classList.remove('overlay');
+    changeElement(document.getElementById('reveal'), {style: {zIndex: 0}, innerHTML: `Reveal Square<br>${this.reveals} Left`});
     changeElement(document.getElementById('grid'), {style: {zIndex: 0}});
     this.isRevealing = false;
   }
