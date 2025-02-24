@@ -2,25 +2,33 @@
 
 [Play it here!](https://codepen.io/Cau-Shimoda/full/KwKMVJE)
 
-[Nonogram](https://en.wikipedia.org/wiki/Nonogram) is a logic puzzle game where you have to find out which pixels, or squares, should be filled. To do this, you should use the numbers on the edges of the grid to guide you.
+[Nonogram](https://en.wikipedia.org/wiki/Nonogram) is a logic puzzle game where you must determine which squares should be filled based on the numbers along the edges of the grid.  
 
-The numbers show how many squares are filled in sequence in that row or column. When the numbers are separated, it means there's a gap between them of at least, but not necessarily, 1 empty square. 
+These numbers indicate how many consecutive squares should be filled in that row or column. If there are multiple numbers, it means there must be at least, but not necessarily, one empty square between each group.  
 
-Example: in a row with the numbers 1 2 1 on its edge, there should be a single filled square, then a gap of at least 1 empty square, then 2 adjacent filled squares, another gap, and finally another single filled square. 
-No other square should be filled in that row. 
+### Example:  
+If a row is labeled **1 2 1**, it means:  
+- One filled square  
+- At least one empty square  
+- Two adjacent filled squares  
+- At least one empty square  
+- One more filled square  
 
-Remember that the numbers don't tell you explicitly which square in that row or column is the first filled one, but sometimes you can deduce logically where to start depending on the numbers and the relationship between crossed rows and columns. 
+No other squares in that row should be filled.  
 
-Normally, a Nonogram forms a picture when completely filled, but as Random Nonogram is random, it won't show any recognizable picture.
+The numbers don’t tell you exactly where to start filling, but through logical deduction and the interaction between rows and columns, you can determine the correct placements.  
 
-## Using the X
+Normally, a Nonogram reveals a picture when completed. However, since **Random Nonogram** generates puzzles randomly, the final image won’t resemble anything specific.  
 
-The X is an element that you can use as a reminder that a given square cannot logically be filled. This will help you solve the puzzle, and the game understands an X filled square as an empty square, not a filled one.
+## Using the X  
 
-## Reveal Square
+The **X** is a helpful tool to mark squares that **cannot** be filled. This can assist in solving the puzzle logically. The game treats X-marked squares as empty, not filled.  
 
-When you have more than 0 "Reveal Square" left, you can use it to pick a square and have its answer revealed. It's only avaiable in medium and hard difficulties. Use it wisely to maximize the information you get from a revealed square. 
+## Reveal Square  
 
-## Note
+If you have at least one **Reveal Square** available, you can use it to uncover the correct state of a chosen square. This feature is only available in **Medium** and **Hard** difficulties. Use it strategically to gain the most useful information.  
 
-It's possible to reutilize the code to build nonograms of different matrices, but it's probably necessary to change the style to fit the squares and numbers on the page.
+## Notes  
+
+The code can be reused to generate Nonograms of different grid sizes. However, some style adjustments may be needed to properly fit the squares and numbers within the layout.  
+
