@@ -58,7 +58,7 @@ class Nonogram {
    * @param {number} [sqHard=24] - Number of filled squares for hard difficulty.
    * @param {number} [revEasy=0] - Number of reveals for easy difficulty.
    * @param {number} [revMedium=1] - Number of reveals for medium difficulty.
-   * @param {number} [revHard=2] - Number of reveals for hard difficulty.
+   * @param {number} [revHard=3] - Number of reveals for hard difficulty.
    */
   constructor(rows = 8, cols = 8, sqEasy = 40, sqMedium = 32, sqHard = 24, revEasy = 0, revMedium = 1, revHard = 3) {
     this.end = false; // Flag to indicate if the game is over.
@@ -138,12 +138,12 @@ class Nonogram {
    * @param {string} axis - The axis ('rows' or 'cols').
    */
   isAxisCorrect(axis) {
-    let row, col, subAxis;
-    const axisToCheck = `${axis}Numbers`;
-    subAxis = axis === 'rows'? 'cols': 'rows';
+    let row, col, subAxis; 
+    const axisToCheck = `${axis}Numbers`; // Construct the property name for the axis numbers.
+    subAxis = axis === 'rows'? 'cols': 'rows'; // Determine the sub-axis.
 
-    for (let axis1 = 0; axis1 < this[axis]; axis1++) {
-      let number = 0, currentAxisIndex = this[axisToCheck][axis1].length - 1;
+    for (let axis1 = 0; axis1 < this[axis]; axis1++) { // Iterate through each row or column.
+      let number = 0, currentAxisIndex = this[axisToCheck][axis1].length - 1; // Initialize number count and index for number hints.
       
       if (axis === 'rows') {
         row = axis1;
@@ -151,35 +151,35 @@ class Nonogram {
         col = axis1;
       }
 
-      for (let axis2 = 0; axis2 < this[subAxis]; axis2++) {
+      for (let axis2 = 0; axis2 < this[subAxis]; axis2++) { // Iterate through each cell in the row or column.
         if (axis === 'rows') {
           col = axis2;
         } else {
           row = axis2;
         }
-        if (this.squares[row][col].state === 1) {
-          if (currentAxisIndex < 0) {
+        if (this.squares[row][col].state === 1) { // If the square is filled.
+          if (currentAxisIndex < 0) { // If we've run out of number hints, it's incorrect.
             return false;
           }
-          number += 1;
-        } else if (number) {
-          if (number !== this[axisToCheck][axis1][currentAxisIndex]) {
+          number += 1; // Increment the count of consecutive filled squares.
+        } else if (number) { // If we encounter an empty square after a sequence of filled squares.
+          if (number !== this[axisToCheck][axis1][currentAxisIndex]) { // Check if the count matches the current hint.
             return false;
           } 
-          number = 0;
-          currentAxisIndex--;
+          number = 0; // Reset the count.
+          currentAxisIndex--; // Move to the next number hint.
         }
       }
       
-      if (currentAxisIndex > 0) {
+      if (currentAxisIndex > 0) { // If there are remaining number hints, it's incorrect.
         return false;
       }
       
-      if (currentAxisIndex === 0 && number !== this[axisToCheck][axis1][currentAxisIndex]) {
+      if (currentAxisIndex === 0 && number !== this[axisToCheck][axis1][currentAxisIndex]) { // Check the last number hint.
         return false;
       }
     }
-    return true;
+    return true; // All hints match, the axis is correct.
   }
 
   /**
@@ -206,15 +206,15 @@ class Nonogram {
    */
   updateSquare(squareId, square) {
     const element = document.getElementById(squareId);
-    square.state = square.state <  2? square.state + 1: 0;
+    square.state = square.state <  2? square.state + 1: 0;  // Cycle through square states (0, 1, 2).
 
     if (square.state === 1) {
-      this.squaresLeft -= 1;
+      this.squaresLeft -= 1; // Decrement remaining squares if filled.
     } else if (square.state === 2) {
-      this.squaresLeft += 1;
+      this.squaresLeft += 1; // Increment remaining squares if marked with 'X'.
     }
 
-    changeElement(element, this.squareAttributes[square.state]);
+    changeElement(element, this.squareAttributes[square.state]); // Update the square's visual appearance.
   }
 
   /**
@@ -224,36 +224,36 @@ class Nonogram {
    */
   determineAxisNumbers(axis) {
     let row, col, subAxis;
-    const axisToUpdate = `${axis}Numbers`;
-    subAxis = axis === 'rows'? 'cols': 'rows';
+    const axisToUpdate = `${axis}Numbers`; // Construct the property name for the axis numbers.
+    subAxis = axis === 'rows'? 'cols': 'rows'; // Determine the sub-axis.
 
-    for (let axis1 = 0; axis1 < this[axis]; axis1++) {
-      const axisNumbers = [];
-      let number = 0;
+    for (let axis1 = 0; axis1 < this[axis]; axis1++) { // Iterate through each row or column.
+      const axisNumbers = []; // Array to store number hints for the current row or column.
+      let number = 0; // Counter for consecutive filled squares.
       if (axis === 'rows') {
         row = axis1;
       } else {
         col = axis1;
       }
 
-      for (let axis2 = 0; axis2 < this[subAxis]; axis2++) {
+      for (let axis2 = 0; axis2 < this[subAxis]; axis2++) { // Iterate through each cell in the row or column.
         if (axis === 'rows') {
           col = axis2;
         } else {
           row = axis2;
         }
-        if (this.squares[row][col].answer) {
-          number += 1;
-        } else if (number) {
-          axisNumbers.unshift(number);
-          number = 0;
+        if (this.squares[row][col].answer) { // If the square should be filled.
+          number += 1; // Increment the counter.
+        } else if (number) { // If we encounter an empty square after a sequence of filled squares.
+          axisNumbers.unshift(number); // Add the count to the front of the number hints array.
+          number = 0; // Reset the counter.
         }
       }
-      if (number || axisNumbers.length === 0) {
+      if (number || axisNumbers.length === 0) { // Add the last count if any, or add 0 if the row/column is empty.
         axisNumbers.unshift(number);
       }
 
-      this[axisToUpdate].push(axisNumbers);
+      this[axisToUpdate].push(axisNumbers); // Add the number hints to the axis numbers array.
     }
   }
 
@@ -261,15 +261,15 @@ class Nonogram {
    * Draws the squares of the Nonogram grid.
    */
   drawSquares() {
-    for (let col = 0; col < this.cols; col++) {
-      const HTMLString1 = `<div id="col${col}"></div>`;
+    for (let col = 0; col < this.cols; col++) { // Iterate through each column.
+      const HTMLString1 = `<div id="col${col}"></div>`; // Create a container for the column.
       const grid = document.getElementById("grid");
-      grid.insertAdjacentHTML('beforeend', HTMLString1);
+      grid.insertAdjacentHTML('beforeend', HTMLString1); // Add the column container to the grid.
 
-      for (let row = 0; row < this.rows; row++) {
-        const HTMLString2 = `<div id="square_${row}_${col}" class="square clickable"></div>`;
+      for (let row = 0; row < this.rows; row++) { // Iterate through each row.
+        const HTMLString2 = `<div id="square_${row}_${col}" class="square clickable"></div>`;  // Create a square element.
         const squareRow = document.getElementById(`col${col}`);
-        squareRow.insertAdjacentHTML('beforeend', HTMLString2);
+        squareRow.insertAdjacentHTML('beforeend', HTMLString2); // Add the square to the column container.
       }
     }
   }
@@ -280,27 +280,27 @@ class Nonogram {
    * @param {string} axis - The axis ('row' or 'col').
    */
   drawNumbers(axis) {
-    for (let currentAxis = 0; currentAxis < this[`${axis}s`]; currentAxis++) {
-      const HTMLString1 = `<div id="${axis}${currentAxis}Numbers" class="${axis}Display"></div>`;
+    for (let currentAxis = 0; currentAxis < this[`${axis}s`]; currentAxis++) { // Iterate through each row or column.
+      const HTMLString1 = `<div id="${axis}${currentAxis}Numbers" class="${axis}Display"></div>`; // Create a container for the number hints.
       const axisNumbers = document.getElementById(`${axis}sNumbers`);
 
-      axisNumbers.insertAdjacentHTML('beforeend', HTMLString1);
+      axisNumbers.insertAdjacentHTML('beforeend', HTMLString1); // Add the number hints container to the axis numbers area.
 
-      for (const number of this[`${axis}sNumbers`][currentAxis]) {
-        const HTMLString2 = `<div class="number">${number}</div>`;
+      for (const number of this[`${axis}sNumbers`][currentAxis]) { // Iterate through each number hint.
+        const HTMLString2 = `<div class="number">${number}</div>`; // Create a number hint element.
         const axisNumbers = document.getElementById(`${axis}${currentAxis}Numbers`);
 
-        axisNumbers.insertAdjacentHTML('beforeend', HTMLString2);
+        axisNumbers.insertAdjacentHTML('beforeend', HTMLString2); // Add the number hint to the container.
       }
     }
   }
 
   // Exits "Reveal Square" state.
   exitReveal() {
-    document.getElementById('reveal-overlay').classList.remove('overlay');
-    changeElement(document.getElementById('reveal'), {style: {zIndex: 0}, innerHTML: `Reveal Square<br>${this.reveals} Left`});
-    changeElement(document.getElementById('grid'), {style: {zIndex: 0}});
-    this.isRevealing = false;
+    document.getElementById('reveal-overlay').classList.remove('overlay'); // Hide the overlay.
+    changeElement(document.getElementById('reveal'), {style: {zIndex: 0}, innerHTML: `Reveal Square<br>${this.reveals} Left`}); // Reset reveal button.
+    changeElement(document.getElementById('grid'), {style: {zIndex: 0}}); // Reset grid z-index.
+    this.isRevealing = false; // Exit reveal state.
   }
 
   /**
@@ -309,37 +309,37 @@ class Nonogram {
    * @param {object} square - The square object.
    */
   revealSquare(squareId, square) {
-    if (!this.isCorrectState(square)) {
-      if (square.state === 1) {
-        square.state = 2;
-        this.squaresLeft += 1;
-      } else {
-        square.state = 1;
-        this.squaresLeft -= 1;
+    if (!this.isCorrectState(square)) { // If the square is not in the correct state.
+      if (square.state === 1) { // If the square is filled.
+        square.state = 2; // Mark it with 'X'. 
+        this.squaresLeft += 1; // Increment remaining squares.
+      } else { // If the square is empty or marked with 'X'.
+        square.state = 1; // Fill it.
+        this.squaresLeft -= 1; // Decrement remaining squares.
       } 
-    } else if (square.state === 0) {
-      square.state = 2;
+    } else if (square.state === 0) { // If the square is empty and correct.
+      square.state = 2; // Mark it with 'X'.
     }
-    changeElement(document.getElementById(squareId), this.squareAttributes[square.state]);
-    this.reveals -= 1;
-    this.exitReveal();
+    changeElement(document.getElementById(squareId), this.squareAttributes[square.state]); // Update the square's visual appearance.
+    this.reveals -= 1; // Decrement remaining reveals.
+    this.exitReveal(); // Exit reveal state.
   }
 
   /**
-   * Set display and game conditions so the player can pick a square to reveal. 
+   * Sets display and game conditions so the player can pick a square to reveal. 
    */
   setReveal() {
-    document.getElementById('reveal-overlay').classList.add('overlay');
-    changeElement(document.getElementById('grid'), {style: {zIndex: 2}});
-    changeElement(document.getElementById('reveal'), {style: {zIndex: 2}, textContent: 'Cancel Reveal'});
-    this.isRevealing = true;
+    document.getElementById('reveal-overlay').classList.add('overlay'); // Show the overlay.
+    changeElement(document.getElementById('grid'), {style: {zIndex: 2}}); // Bring the grid to the front.
+    changeElement(document.getElementById('reveal'), {style: {zIndex: 2}, textContent: 'Cancel Reveal'}); // Change reveal button text and bring it to the front.
+    this.isRevealing = true; // Enter reveal state.
   }
 
   /**
    * Starts a new game.
    */
-  startNewGame() {
-    if (this.end) {
+  startNewGame() { 
+    if (this.end) { // If the game has ended, reset the grid and number hints.
       this.squares = [];
       this.rowsNumbers = [];
       this.colsNumbers = [];
@@ -348,7 +348,7 @@ class Nonogram {
       deleteElementByClass('colDisplay');
     }
 
-    this.initializeNonogram(document.getElementById('dif-selection').value);
+    this.initializeNonogram(document.getElementById('dif-selection').value); // Initialize the game grid with the selected difficulty.
     this.determineAxisNumbers('rows');
     this.determineAxisNumbers('cols');
 
@@ -363,7 +363,7 @@ class Nonogram {
    */
   resetPage() {
     const overlay = document.getElementById('overlay');
-    overlay.classList.remove('overlay');
+    overlay.classList.remove('overlay'); // Hide the win message overlay.
     overlay.classList.add('hidden');
     this.startNewGame();
   }
@@ -373,7 +373,7 @@ class Nonogram {
    */
   showWinMsg() {
     const overlay = document.getElementById('overlay');
-    overlay.classList.remove('hidden');
+    overlay.classList.remove('hidden'); // Show the win message overlay.
     overlay.classList.add('overlay');
   }
 
@@ -383,41 +383,40 @@ class Nonogram {
    * @param {Event} event - The click event object.
    */
   handleClick(event) {
-    if (!this.end) {
-      if (event.target.classList.contains('square')) {
+    if (!this.end) { // If the game is not over.
+      if (event.target.classList.contains('square')) { // If a square is clicked.
         const squareId = event.target.id;
         const idSplit = squareId.split('_');
         const row = idSplit[1], col = idSplit[2];
 
-        if (this.isRevealing) {
-          this.revealSquare(squareId, this.squares[row][col]);
-        } else {
-          this.updateSquare(squareId, this.squares[row][col]);
+        if (this.isRevealing) { // If in reveal state.
+          this.revealSquare(squareId, this.squares[row][col]); // Reveal the square.
+        } else { // If in normal state.
+          this.updateSquare(squareId, this.squares[row][col]); // Update the square's state.
         }
-        if (!this.squaresLeft) {
-          console.log('Checking');
-          if (this.isGameOver()) {
-            this.showWinMsg();
+        if (!this.squaresLeft) { // If there are as many squares filled as the total to the current difficulty.
+          if (this.isGameOver()) { // Check if the game is over.
+            this.showWinMsg(); // Show the win message.
           }
         }
         return;
       }
-      if (event.target.id === 'reveal' && this.reveals) {
-        if (this.isRevealing) {
-          this.exitReveal();
+      if (event.target.id === 'reveal' && this.reveals) { // If the reveal button is clicked and reveals are available.
+        if (this.isRevealing) { // If already in reveal state.
+          this.exitReveal(); // Exit reveal state.
           return;
         }
-        this.setReveal();
+        this.setReveal(); // Enter reveal state.
         return;
       }
-    } else if (event.target.id === 'reset-page') {
-      this.resetPage();
+    } else if (event.target.id === 'reset-page') { // If the reset button is clicked after the game is over.
+      this.resetPage(); // Reset the page.
       return;
     }
 
-    if (event.target.id === 'new-game') {
-      this.end = true;
-      this.startNewGame();
+    if (event.target.id === 'new-game') { // If the new game button is clicked.
+      this.end = true; // Set the game over flag.
+      this.startNewGame(); // Start a new game.
     }
   }
 }
