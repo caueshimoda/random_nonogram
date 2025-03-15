@@ -14,7 +14,7 @@ body {
   visibility: hidden;
   font-family: "Helvetica", sans-serif;
   background: linear-gradient(to bottom,
-    darken(white, 15%),
+    #eeeeee,
     white
   );
   color: black;
@@ -118,6 +118,21 @@ a:hover {
   text-align: center;
   font-size: var(--number-size);
   font-weight: bold;
+}
+
+#clear {
+  position: absolute;
+  left: calc((100vw - 8*var(--square-size))/2 + 8.5*var(--square-size));
+  top: calc(24vh + 4*var(--square-size));
+  border: 2px solid var(--square-border-color);
+  font-size: calc(0.3 * var(--square-size));
+  font-weight: bold;
+  border-radius: 30%;
+  background: linear-gradient(
+    #dddd22,
+    #ffff22
+  );
+  padding: 3px;
 }
 
 #footer {

@@ -69,7 +69,8 @@ class Nonogram {
     this.rowsNumbers = []; // Array to store row number hints.
     this.colsNumbers = []; // Array to store column number hints.
     this.revealTable = { Easy: revEasy, Medium: revMedium, Hard: revHard }; // Object mapping difficulty to reveal counts.
-    this.reveals = 0; // Remaining reveals.
+    this.reveals = 0; // Number of reveals
+    this.revealed = []; // Squares revealed.
     this.isRevealing = false; // Flag to indicate if the game is in reveal square state.
     this.filledSquares = { Easy: sqEasy, Medium: sqMedium, Hard: sqHard }; // Object mapping difficulty to filled square counts.
     this.squareAttributes = { // Object mapping square states to their visual attributes.
@@ -95,6 +96,7 @@ class Nonogram {
     const difficultyElement = document.getElementById('difficulty'); // Get the difficulty display element.
     difficultyElement.innerText = difficulty; // Update the difficulty display.
     this.squaresLeft = filledSquaresLeft; // Sets the number of squares for the player to fill.
+    this.revealed = []; // Resets the revealed array.
 
     // Randomly select squares to fill.
     while (filledSquaresLeft) {
@@ -213,7 +215,7 @@ class Nonogram {
     } else if (square.state === 2) {
       this.squaresLeft += 1; // Increment remaining squares if marked with 'X'.
     }
-
+  
     changeElement(element, this.squareAttributes[square.state]); // Update the square's visual appearance.
   }
 
@@ -298,7 +300,7 @@ class Nonogram {
   // Exits "Reveal Square" state.
   exitReveal() {
     document.getElementById('reveal-overlay').classList.remove('overlay'); // Hide the overlay.
-    changeElement(document.getElementById('reveal'), {style: {zIndex: 0}, innerHTML: `Reveal Square<br>${this.reveals} Left`}); // Reset reveal button.
+    changeElement(document.getElementById('reveal'), {style: {zIndex: 0}, innerHTML: `Reveal Square<br>${this.reveals - this.revealed.length} Left`}); // Reset reveal button.
     changeElement(document.getElementById('grid'), {style: {zIndex: 0}}); // Reset grid z-index.
     this.isRevealing = false; // Exit reveal state.
   }
@@ -321,7 +323,9 @@ class Nonogram {
       square.state = 2; // Mark it with 'X'.
     }
     changeElement(document.getElementById(squareId), this.squareAttributes[square.state]); // Update the square's visual appearance.
-    this.reveals -= 1; // Decrement remaining reveals.
+    const idSplit = squareId.split('_');
+    const row = idSplit[1], col = idSplit[2];
+    this.revealed.push(row + col);
     this.exitReveal(); // Exit reveal state.
   }
 
@@ -333,6 +337,24 @@ class Nonogram {
     changeElement(document.getElementById('grid'), {style: {zIndex: 2}}); // Bring the grid to the front.
     changeElement(document.getElementById('reveal'), {style: {zIndex: 2}, textContent: 'Cancel Reveal'}); // Change reveal button text and bring it to the front.
     this.isRevealing = true; // Enter reveal state.
+  }
+  
+  clear() {
+    let row = 0, col = 0;
+    for (const square_row of this.squares) {
+      for (const square_col of square_row) {
+        if (!this.revealed.includes(`${row}${col}`) && square_col.state) {
+          if (square_col.state === 1) {
+            this.squaresLeft++;
+          }
+          square_col.state = 0;
+          changeElement(document.getElementById(`square_${row}_${col}`), this.squareAttributes[0]);
+        }
+        col++;
+      }
+      col = 0;
+      row++;
+    }
   }
 
   /**
@@ -391,7 +413,7 @@ class Nonogram {
 
         if (this.isRevealing) { // If in reveal state.
           this.revealSquare(squareId, this.squares[row][col]); // Reveal the square.
-        } else { // If in normal state.
+        } else if (!this.revealed.includes(`${row}${col}`)) { // If in normal state.
           this.updateSquare(squareId, this.squares[row][col]); // Update the square's state.
         }
         if (!this.squaresLeft) { // If there are as many squares filled as the total to the current difficulty.
@@ -401,12 +423,16 @@ class Nonogram {
         }
         return;
       }
-      if (event.target.id === 'reveal' && this.reveals) { // If the reveal button is clicked and reveals are available.
+      if (event.target.id === 'reveal' && this.revealed.length < this.reveals) { // If the reveal button is clicked and reveals are available.
         if (this.isRevealing) { // If already in reveal state.
           this.exitReveal(); // Exit reveal state.
           return;
         }
         this.setReveal(); // Enter reveal state.
+        return;
+      }
+      if (event.target.id === 'clear') {
+        this.clear();
         return;
       }
     } else if (event.target.id === 'reset-page') { // If the reset button is clicked after the game is over.
