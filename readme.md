@@ -26,7 +26,7 @@ The **X** is a helpful tool to mark squares that **cannot** be filled. This can 
 
 ## Reveal Square  
 
-If you have at least one **Reveal Square** available, you can use it to uncover the correct state of a chosen square. This feature is only available in **Medium** and **Hard** difficulties. Use it strategically to gain the most useful information.  
+If you have at least one **Reveal Square** available, you can use it to uncover the correct state of a chosen square. This feature is only available in **Medium** and **Hard** difficulties. Use it strategically to gain the most useful information. Note: revealed squares won't change when you click them and won't be cleared with the clear button.  
 
 ## Notes  
 
